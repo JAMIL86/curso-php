@@ -2,14 +2,12 @@
 
 function resolve($route) {
     $path = $_SERVER['PATH_INFO'] ?? '/';
-
-    $route = '/^' .  str_replace('/', '\/' ,$route) . '$/';
-
+    $route = '/^'.str_replace('/', '\/' ,$route).'$/';
+    
     if (preg_match($route, $path, $params)) {
         return $params;
     }
-
-    return false;
+        return false;
 }
 
 function render($content, $template, array $data = []){
@@ -19,7 +17,7 @@ function render($content, $template, array $data = []){
 
 if (resolve('/admin/?(.*)')) {
    require __DIR__ . '/admin/routes.php';
-} elseif (resolve('/(/*)')) {
+} elseif (resolve('/(.*)')) {
     require __DIR__ . '/site/routes.php';
 }
 
