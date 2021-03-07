@@ -1,25 +1,44 @@
 <?php
 
+
+
 if (resolve('/admin')) {
     render('admin/home', 'admin');
+} elseif (resolve('/admin/auth.*')) {
+    include __DIR__ . '/auth/routes.php';
+} elseif (resolve('/admin/pages.*')) {
+    include __DIR__ . '/pages/routes.php';
+} elseif (resolve('/admin/users.*')) {
+    include __DIR__ . '/users/routes.php'; 
+} elseif (resolve('/admin/upload/image')) {
+    $file = $_FILES['file'] ?? null;
 
-}elseif (resolve('/admin/pages')) {
-    render('admin/pages/index', 'admin');
+    if (!$file) {
+        http_response_code(422);
+        echo 'nenhum arquivo enviado';
+        exit;
+    }
 
-}elseif (resolve('/admin/pages/create')){
-    render('admin/pages/create', 'admin');
+    $allowedTypes = [
+        'image/gif',
+        'image/jpg',
+        'image/jpeg',
+        'image/png',
+    ];
 
-}elseif (resolve('/admin/pages/(\d)+')){
-    render('admin/pages/view', 'admin');
+    if (!in_array($file['type'], $allowedTypes)) {
+        http_response_code(422);
+        echo 'arquivo não permitido';
+        exit;
+    }
 
-}elseif (resolve('/admin/pages/(\d)+/edit')){
-    render('admin/pages/edit', 'admin');
+    $name = uniqid(rand(), true) . '.' . pathinfo($file['name'], PATHINFO_EXTENSION);
 
-}elseif (resolve('/admin/pages/(\d)+/delete')){
-    header('location: /admin/pages');
-} 
+    move_uploaded_file($file['tmp_name'], __DIR__ . '/../public/upload/' . $name);
 
-else {
+    echo '/upload/' . $name;
+
+} else {
     http_response_code(404);
     echo 'Página não encontrada';
 }
